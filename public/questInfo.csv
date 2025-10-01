@@ -1,0 +1,4 @@
+quest ID,Title,Quest descript,Quest duration,xp,coins,status,creation date,account ID
+Q001,Gather Herbs in the Forest,Collect 10 healing herbs from the Whispering Woods.,2 hours,150,50,active,2025-09-30,A123
+Q002,Defeat the Cave Troll,Enter the Dark Cave and defeat the troll guarding the treasure.,3 hours,300,120,active,2025-09-30,A123
+Q003,Deliver Supplies to the Village,Transport food and medicine to the village of Eldenbrook.,1.5 hours,100,40,completed,2025-09-29,A123
