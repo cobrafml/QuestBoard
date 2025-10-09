@@ -1,9 +1,10 @@
 // App.tsx
 
 import { HashRouter as Router, Routes, Route } from "react-router-dom";
-import  {Home}  from "./pages/homePage.jsx";
+import  {Home}  from "./pages/homePage";
 import  {QuestCreator}  from "./pages/QuestCreator.jsx";
-import  {History}  from "./pages/History.jsx";
+import  {History}  from "./pages/History";
+import {Profile} from './pages/profile.jsx'
 import { Layout } from "./components/Layout";
 import { useCsv } from "./components/CsvPrevider.jsx";
 import { useEffect } from "react";
@@ -41,6 +42,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/create-quests" element={<QuestCreator />} />
           <Route path="/history" element={<History />} />
+          <Route path="/profile" element={<Profile/>} />
         </Route>
       </Routes>
     </Router>

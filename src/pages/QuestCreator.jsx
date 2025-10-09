@@ -2,96 +2,129 @@ import { useState } from "react"
 
 export function QuestCreator()
 {
-    /*newItem holds current value of input feeld
-    todos hold info from the feelds like title and id*/ 
-    const [newItem,setNewItem] = useState("")
-    const [todos, setQuest] = useState([])
     
-    function submissionHandler(e){
-        e.preventDefault()
+const [title, setTitle] = useState("");
+const [description, setDescription] = useState("");
+const [duration, setDuration] = useState("One Day");
 
-        setQuest(currentQuest => {
-            return [ ...currentQuest,
-                //uses randomUUID to generate a unique ID
-                {id: crypto.randomUUID(), title:newItem, remove: false},
+const handleCreateQuest = () => {
+    console.log("Button clicked!");
 
-            ]
-        })
-        setNewItem("") //resetts input field
+    // Validate inputs
+    if (!title.trim() || !description.trim()) {
+    alert("Please fill in all fields!");
+    return;
     }
 
-    function toggleQuest(id, remove){
-        //uppdated teh remove status of an item
-        setQuest(currentQuest=>{
-            //finds item by id and keeps the other unchanged
-            return currentQuest.map(todo =>{
-                if(todo.id===id)
-                {
-                    return{...todo, remove}
-                }
-                return todo
-            })
-        })
-    }
+    // Duration mapping
+    const durationMap = {
+    "One Time": 1,
+    "One Day": 2,
+    "One week": 3,
+    "One Month": 12
+    };
 
-    function deleteQuest(id){
-        setQuest(currentQuest =>{
-            //fileter to keep all items but the one maching the id
-            return currentQuest.filter(todo => todo.id !== id)
-        })
-    }
-    return(
-        <>
-            <h1> Crate your quests here</h1>
-            <form onSubmit={submissionHandler}>
-                <div>
-                    <label htmlFor="title">Quest title</label>
-                    {/*e stand for event object and traget is in this case the 
-                     textbox and value acceces the text in the box */} 
-                    <input value={newItem} onChange={e => setNewItem(e.target.value)} type="text" maxLength="50" id = "title"/>
-                </div>
-                <div>
-                    <lable htmlFor ="descript">Quest description</lable>
-                    <input type="text" maxLength="200" id = "descript"/>
-                </div>
-            
-                <div>
-                    <label>One day</label>
-                    <input type="radio" name="time_limit" value="1"/> 
-                </div>
-                <div>
-                    <label>One week</label>
-                    <input type="radio" name="time_limit" value="7"/> 
-                </div>
-                <div>
-                    <label>30 days</label>
-                    <input type="radio" name="time_limit" value="30"/> 
-                </div>
-                <div>
-                    <label>No time limit</label>
-                    <input type="radio" name="time_limit" value=""/> 
-                </div>
-                
-                    <button className="create_btn">Create Quest</button>
-                
-            </form>
-            <h1 className="header">Created quests:</h1>
-            <ul className="list">
+    const durationHours = durationMap[duration];
+    const baseXP = 100;
+    const xpPerHour = 50;
+    const xp = baseXP + durationHours * xpPerHour;
+    const coins = Math.floor(xp / 2);
 
-                {todos.map(todo =>{
-                    return( <li key ={todo.id}>
-                        <label >
-                            <input type="checkbox" checked={todo.remove} 
-                            onChange={e => toggleQuest(todo.id, e.target.checked)} />
-                            {todo.title}
-                        </label>
-                        <button className="btn-delete-btn" onClick={()=>deleteQuest(todo.id)}> Delete </button>
-                    </li>)
-                
-                })}
-                
-            </ul>
+    const questId = `Q${Date.now()}`;
+    const creationDate = new Date().toISOString().split("T")[0];
+    const accountId = "A123";
 
-        </>
-    )
-}
+    const newQuest = {
+    questId,
+    title,
+    description,
+    duration,
+    xp,
+    coins,
+    status: "active",
+    creationDate,
+    accountId
+    };
+
+    // Get existing quests
+    const stored = localStorage.getItem("quests");
+    const quests = stored ? JSON.parse(stored) : [];
+
+    quests.push(newQuest);
+
+    // Save back to localStorage
+    localStorage.setItem("quests", JSON.stringify(quests));
+
+
+    // Reset form fields
+    setTitle("");
+    setDescription("");
+    setDuration("One Day");
+};
+
+return (
+    <>
+        <div style={{ color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
+        <h2 style={{ marginBottom: "20px" }}>Create Quest</h2>
+
+        {/* Quest Title */}
+        <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "8px" }}>Quest title</label>
+            <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            />
+        </div>
+
+        {/* Quest Description */}
+        <div style={{ marginBottom: "15px" }}>
+            <label style={{ display: "block", marginBottom: "8px" }}>Quest description</label>
+            <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            />
+        </div>
+
+        {/* Duration Dropdown */}
+        <div style={{ marginBottom: "20px" }}>
+            <label style={{ display: "block", marginBottom: "8px" }}>Duration</label>
+            <select
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+            >
+            <option value="One Time">One Time</option>
+            <option value="One Day">One Day</option>
+            <option value="One week">One week</option>
+            <option value="One Month">One Month</option>
+            </select>
+        </div>
+
+        {/* Create Button */}
+        <button
+            style={{
+                width: "100%",
+                backgroundColor: "#4c0c77",
+                color: "#fff",
+                padding: "10px",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+                fontSize: "16px"
+            }}
+            type="button"
+            onClick={handleCreateQuest}
+            >
+            Create Quest
+        </button>
+        </div>
+
+    </>
+);
+
+};
+
