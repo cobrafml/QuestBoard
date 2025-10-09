@@ -1,8 +1,6 @@
-import { useState } from "react"
+import { useState } from "react";
 
-export function QuestCreator()
-{
-    
+export function QuestCreator() {
 const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
 const [duration, setDuration] = useState("One Day");
@@ -21,7 +19,7 @@ const handleCreateQuest = () => {
     "One Time": 1,
     "One Day": 2,
     "One week": 3,
-    "One Month": 12
+    "One Month": 12,
     };
 
     const durationHours = durationMap[duration];
@@ -32,7 +30,16 @@ const handleCreateQuest = () => {
 
     const questId = `Q${Date.now()}`;
     const creationDate = new Date().toISOString().split("T")[0];
-    const accountId = "A123";
+
+    //  Get currently logged-in user
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+    if (!loggedInUser) {
+    alert("You must be logged in to create a quest!");
+    return;
+    }
+
+    // Use password as accountId
+    const accountId = loggedInUser.id; // password stored as id
 
     const newQuest = {
     questId,
@@ -43,7 +50,7 @@ const handleCreateQuest = () => {
     coins,
     status: "active",
     creationDate,
-    accountId
+    accountId,
     };
 
     // Get existing quests
@@ -55,7 +62,6 @@ const handleCreateQuest = () => {
     // Save back to localStorage
     localStorage.setItem("quests", JSON.stringify(quests));
 
-
     // Reset form fields
     setTitle("");
     setDescription("");
@@ -64,67 +70,64 @@ const handleCreateQuest = () => {
 
 return (
     <>
-        <div style={{ color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
+    <div style={{ color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
         <h2 style={{ marginBottom: "20px" }}>Create Quest</h2>
 
         {/* Quest Title */}
         <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "8px" }}>Quest title</label>
-            <input
+        <label style={{ display: "block", marginBottom: "8px" }}>Quest title</label>
+        <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
+        />
         </div>
 
         {/* Quest Description */}
         <div style={{ marginBottom: "15px" }}>
-            <label style={{ display: "block", marginBottom: "8px" }}>Quest description</label>
-            <input
+        <label style={{ display: "block", marginBottom: "8px" }}>Quest description</label>
+        <input
             type="text"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
-            />
+        />
         </div>
 
         {/* Duration Dropdown */}
         <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "8px" }}>Duration</label>
-            <select
+        <label style={{ display: "block", marginBottom: "8px" }}>Duration</label>
+        <select
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
-            >
+        >
             <option value="One Time">One Time</option>
             <option value="One Day">One Day</option>
             <option value="One week">One week</option>
             <option value="One Month">One Month</option>
-            </select>
+        </select>
         </div>
 
         {/* Create Button */}
         <button
-            style={{
-                width: "100%",
-                backgroundColor: "#4c0c77",
-                color: "#fff",
-                padding: "10px",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-                fontSize: "16px"
-            }}
-            type="button"
-            onClick={handleCreateQuest}
-            >
-            Create Quest
+        style={{
+            width: "100%",
+            backgroundColor: "#4c0c77",
+            color: "#fff",
+            padding: "10px",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            fontSize: "16px",
+        }}
+        type="button"
+        onClick={handleCreateQuest}
+        >
+        Create Quest
         </button>
-        </div>
-
+    </div>
     </>
 );
-
-};
-
+}
