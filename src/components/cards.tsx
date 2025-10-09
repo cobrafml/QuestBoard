@@ -32,7 +32,7 @@ const DataCard: React.FC<DataCardProps> = ({ item, onDelete, onComplete }) => {
       <p><strong>Status:</strong> {item.status}</p>
       <p><strong>Account ID:</strong> {item["account ID"]}</p>
 
-      {/* ✅ Buttons */}
+      {/*  Buttons */}
       <div style={{ display: "flex", gap: "12px", marginTop: "10px" }}>
         {onComplete && (
           <button
