@@ -7,79 +7,184 @@ interface QuestItem {
   xp: string;
   coins: string;
   status: string;
-  "account ID": string;
 }
 
 interface DataCardProps {
   item: QuestItem;
   onDelete: () => void;
-  onComplete?: () => void; // ✅ Optional for History page
+  onComplete?: () => void;
+  onView?: () => void;
+  onFail?: () => void;
+  onEdit?: () => void;
 }
 
-const DataCard: React.FC<DataCardProps> = ({ item, onDelete, onComplete }) => {
+const DataCard: React.FC<DataCardProps> = ({
+  item,
+  onDelete,
+  onComplete,
+  onView,
+  onFail,
+  onEdit
+}) => {
   return (
-    <> 
-    <div style={styles.card}>
-      <h3>{item.Title}</h3>
-      <div>
-        <strong>Description:</strong>
-        <p style={{ marginTop: '0.5rem' }}>{item["Quest descript"]}</p>
+    <div style={styles.card} onClick={onView}>
+      <h3 style={styles.title}>{item.Title}</h3>
+
+      <div style={styles.infoBlock}>
+        <p style={styles.label}>Description:</p>
+        <p style={styles.value}>{item["Quest descript"]}</p>
       </div>
 
-      <p><strong>Duration:</strong> {item["Quest duration"]}</p>
-      <p><strong>XP:</strong> {item.xp}</p>
-      <p><strong>Coins:</strong> {item.coins}</p>
-      <p><strong>Status:</strong> {item.status}</p>
-      <p><strong>Account ID:</strong> {item["account ID"]}</p>
+      <div style={styles.infoBlock}>
+        <p style={styles.label}>Duration:</p>
+        <p style={styles.value}>{item["Quest duration"]}</p>
+      </div>
 
-      {/*  Buttons */}
-      <div style={{ display: "flex", gap: "12px", marginTop: "10px" }}>
+      <div style={styles.infoBlock}>
+        <p style={styles.label}>XP:</p>
+        <p style={styles.value}>{item.xp}</p>
+      </div>
+
+      <div style={styles.infoBlock}>
+        <p style={styles.label}>Coins:</p>
+        <p style={styles.value}>{item.coins}</p>
+      </div>
+
+      <div style={styles.infoBlock}>
+        <p style={styles.label}>Status:</p>
+        <p style={styles.value}>{item.status}</p>
+      </div>
+
+      <div style={styles.buttonRow}>
         {onComplete && (
           <button
-            style={{
-              flex: 1,
-              backgroundColor: "#4c0c77ff",
-              color: "#fff",
-              padding: "8px 12px",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer"
+            style={styles.completeButton}
+            onClick={(e) => {
+              e.stopPropagation();
+              onComplete();
             }}
-            onClick={onComplete}
           >
             Complete
           </button>
         )}
         <button
-          style={{
-            flex: 1,
-            backgroundColor: "#04858aff",
-            color: "#fff",
-            padding: "8px 12px",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer"
+          style={styles.deleteButton}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
           }}
-          onClick={onDelete}
         >
           Delete
         </button>
       </div>
+
+      {(onFail || onEdit) && (
+        <div style={styles.buttonRow}>
+          {onFail && (
+            <button
+              style={styles.failButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                onFail();
+              }}
+            >
+              Fail Quest
+            </button>
+          )}
+          {onEdit && (
+            <button
+              style={styles.editButton}
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit();
+              }}
+            >
+              Edit Quest
+            </button>
+          )}
+        </div>
+      )}
     </div>
-    </>
   );
 };
 
-const styles: { card: React.CSSProperties } = {
+const styles: { [key: string]: React.CSSProperties } = {
   card: {
-    border: '1px solid #000000ff',
+    border: '1px solid #000',
     borderRadius: '8px',
     padding: '1rem',
-    margin: '1rem',
+    margin: '0.5rem',
     boxShadow: '0 5px 10px rgba(151, 81, 231, 1)',
-    maxWidth: '300px',
     backgroundColor: '#222',
-    color: '#fff'
+    color: '#fff',
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    boxSizing: 'border-box'
+  },
+  title: {
+    marginBottom: '0.8rem',
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    wordBreak: 'break-word'
+  },
+  infoBlock: {
+    marginBottom: '0.8rem'
+  },
+  label: {
+    fontWeight: 'bold',
+    marginBottom: '0.2rem'
+  },
+  value: {
+    margin: 0,
+    color: '#ccc',
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis'
+  },
+  buttonRow: {
+    display: "flex",
+    gap: "8px",
+    marginTop: "10px"
+  },
+  completeButton: {
+    flex: 1,
+    backgroundColor: "#4c0c77",
+    color: "#fff",
+    padding: "8px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+  deleteButton: {
+    flex: 1,
+    backgroundColor: "#04858a",
+    color: "#fff",
+    padding: "8px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+  failButton: {
+    flex: 1,
+    backgroundColor: "#a00",
+    color: "#fff",
+    padding: "8px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer"
+  },
+  editButton: {
+    flex: 1,
+    backgroundColor: "#0a7",
+    color: "#fff",
+    padding: "8px",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer"
   }
 };
 
