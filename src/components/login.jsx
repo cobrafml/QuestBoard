@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "../supabaseClient";
 
 export function Login() {
 const [username, setUsername] = useState("");
@@ -8,59 +9,59 @@ const [message, setMessage] = useState("");
 const navigate = useNavigate();
 
 useEffect(() => {
-    // Clear session when visiting login page
     sessionStorage.removeItem("loggedInUser");
 }, []);
 
-const getProfiles = () => {
-    const data = localStorage.getItem("profiles");
-    return data ? JSON.parse(data) : [];
-};
+const handleLogin = async () => {
+    const { data, error } = await supabase
+    .from("Accounts")
+    .select("*")
+    .eq("Account name", username)
+    .eq("Passord", password)
+    .single();
 
-const saveProfiles = (profiles) => {
-    localStorage.setItem("profiles", JSON.stringify(profiles));
-};
-
-const handleLogin = () => {
-    const profiles = getProfiles();
-    const match = profiles.find(
-    (profile) => profile.username === username && profile.id === password
-    );
-    if (match) {
-    sessionStorage.setItem("loggedInUser", JSON.stringify(match));
-    navigate("/");
-    } else {
+    if (error || !data) {
     setMessage("Invalid username or password.");
+    } else {
+    sessionStorage.setItem("loggedInUser", JSON.stringify(data)); // ✅ Includes id
+    navigate("/");
     }
 };
 
-const handleCreateAccount = () => {
-    const profiles = getProfiles();
-    const usernameExists = profiles.some((profile) => profile.username === username);
-    const passwordExists = profiles.some((profile) => profile.id === password);
+const handleCreateAccount = async () => {
+    // Check if username exists
+    const { data: existing } = await supabase
+    .from("Accounts")
+    .select("*")
+    .eq("Account name", username);
 
-    if (usernameExists) {
+    if (existing && existing.length > 0) {
     setMessage("Username already exists.");
     return;
     }
 
-    if (passwordExists) {
-    setMessage("Password already in use.");
-    return;
-    }
-
     const newProfile = {
-    avatar: 1,
-    xp: 0,
+    "Account name": username,
+    Passord: password,
     level: 1,
-    id: password,
-    username: username,
+    XP: 0,
+    Coins: 0,
+    streek: 0,
     };
 
-    profiles.push(newProfile);
-    saveProfiles(profiles);
-    sessionStorage.setItem("loggedInUser", JSON.stringify(newProfile));
+    // ✅ Insert and fetch the inserted row (with id)
+    const { data, error } = await supabase
+    .from("Accounts")
+    .insert([newProfile])
+    .select()
+    .single();
+
+    if (error) {
+    setMessage("Error creating account.");
+    } else {
+    sessionStorage.setItem("loggedInUser", JSON.stringify(data)); // ✅ Includes id
     navigate("/");
+    }
 };
 
 return (

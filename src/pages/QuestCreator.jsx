@@ -1,133 +1,116 @@
 import { useState } from "react";
+import { supabase } from "../supabaseClient";
 
 export function QuestCreator() {
 const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
-const [duration, setDuration] = useState("One Day");
+const [duration, setDuration] = useState(1); // Default: One Day
+const [message, setMessage] = useState("");
 
-const handleCreateQuest = () => {
-    console.log("Button clicked!");
-
-    // Validate inputs
+const handleCreateQuest = async () => {
     if (!title.trim() || !description.trim()) {
-    alert("Please fill in all fields!");
+    setMessage("Please fill in all fields!");
     return;
     }
 
-    // Duration mapping
-    const durationMap = {
-    "One Time": 1,
-    "One Day": 2,
-    "One week": 3,
-    "One Month": 12,
-    };
-
-    const durationHours = durationMap[duration];
+    // XP and Coins calculation
     const baseXP = 100;
-    const xpPerHour = 50;
-    const xp = baseXP + durationHours * xpPerHour;
+    const xpPerDay = 50;
+    const xp = baseXP + duration * xpPerDay;
     const coins = Math.floor(xp / 2);
 
-    const questId = `Q${Date.now()}`;
-    const creationDate = new Date().toISOString().split("T")[0];
-
-    //  Get currently logged-in user
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+    // Get logged-in user
+    const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
     if (!loggedInUser) {
-    alert("You must be logged in to create a quest!");
+    setMessage("You must be logged in to create a quest!");
     return;
     }
 
-    // Use password as accountId
-    const accountId = loggedInUser.id; // password stored as id
+    const accountId = loggedInUser.id;
 
+    // Prepare quest object
     const newQuest = {
-    questId,
-    title,
-    description,
-    duration,
-    xp,
-    coins,
-    status: "active",
-    creationDate,
-    accountId,
+    Title: title,
+    Description: description,
+    duration: duration, // matches column name
+    accountID: accountId,
+    XP: xp,
+    Coins: coins,
+    stateus: "active", // ✅ set status to active
     };
 
-    // Get existing quests
-    const stored = localStorage.getItem("quests");
-    const quests = stored ? JSON.parse(stored) : [];
+    const { error } = await supabase.from("Quests").insert([newQuest]);
 
-    quests.push(newQuest);
-
-    // Save back to localStorage
-    localStorage.setItem("quests", JSON.stringify(quests));
-
-    // Reset form fields
+    if (error) {
+    setMessage("Error creating quest: " + error.message);
+    } else {
     setTitle("");
     setDescription("");
-    setDuration("One Day");
+    setDuration(1);
+    setMessage("Quest created successfully!");
+    }
 };
 
 return (
-    <>
     <div style={{ color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Create Quest</h2>
+    <h2 style={{ marginBottom: "20px" }}>Create Quest</h2>
 
-        {/* Quest Title */}
-        <div style={{ marginBottom: "15px" }}>
+    {/* Title */}
+    <div style={{ marginBottom: "15px" }}>
         <label style={{ display: "block", marginBottom: "8px" }}>Quest title</label>
         <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+        type="text"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
-        </div>
+    </div>
 
-        {/* Quest Description */}
-        <div style={{ marginBottom: "15px" }}>
+    {/* Description */}
+    <div style={{ marginBottom: "15px" }}>
         <label style={{ display: "block", marginBottom: "8px" }}>Quest description</label>
         <input
-            type="text"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+        type="text"
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
         />
-        </div>
+    </div>
 
-        {/* Duration Dropdown */}
-        <div style={{ marginBottom: "20px" }}>
-        <label style={{ display: "block", marginBottom: "8px" }}>Duration</label>
+    {/* Duration */}
+    <div style={{ marginBottom: "20px" }}>
+        <label style={{ display: "block", marginBottom: "8px" }}>Duration (days)</label>
         <select
-            value={duration}
-            onChange={(e) => setDuration(e.target.value)}
-            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+        value={duration}
+        onChange={(e) => setDuration(Number(e.target.value))}
+        style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
         >
-            <option value="One Time">One Time</option>
-            <option value="One Day">One Day</option>
-            <option value="One week">One week</option>
-            <option value="One Month">One Month</option>
+        <option value={0}>One Time (0 days)</option>
+        <option value={1}>One Day</option>
+        <option value={7}>One Week</option>
+        <option value={30}>One Month</option>
         </select>
-        </div>
+    </div>
 
-        {/* Create Button */}
-        <button
+    {/* Button */}
+    <button
         style={{
-            width: "100%",
-            backgroundColor: "#4c0c77",
-            color: "#fff",
-            padding: "10px",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            fontSize: "16px",
+        width: "100%",
+        backgroundColor: "#4c0c77",
+        color: "#fff",
+        padding: "10px",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer",
+        fontSize: "16px",
         }}
         type="button"
         onClick={handleCreateQuest}
-        >
+    >
         Create Quest
-        </button>
+    </button>
+
+    {message && <p style={{ marginTop: "10px", color: "#ccc" }}>{message}</p>}
     </div>
-    </>
 );
 }
