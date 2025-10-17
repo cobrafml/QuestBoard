@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import DataCard from "../components/cards";
+import {DataCard} from "../components/cards";
 import { supabase } from "../supabaseClient";
 
 export function Home() {

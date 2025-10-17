@@ -23,6 +23,7 @@ return (
         <Link to="/create-quests"><button>Create quest</button></Link>
         <Link to="/history"><button>Past Quests</button></Link>
         <Link to="/profile"><button>Profile</button></Link>
+        <Link to="/Store"><button>Store</button></Link>
         <button onClick={handleLogout}>Logout</button>
         <button
         onClick={handleClearAllData}
