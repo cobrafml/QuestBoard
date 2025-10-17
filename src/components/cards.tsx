@@ -108,6 +108,38 @@ const DataCard: React.FC<DataCardProps> = ({
   );
 };
 
+
+// fore store
+
+interface StoreItem {
+  id: number;
+  name: string;
+  price: number;
+  imageURL: string;
+}
+
+interface StorePrompts {
+  item: StoreItem;
+  onPurchase: () => void;
+  disabled?: boolean;
+}
+
+const ItemCards: React.FC<StorePrompts> = ({ item, onPurchase, disabled }) => {
+  return (
+    <div className="card">
+      <img src={item.imageURL} alt={item.name} />
+      <h3>{item.name}</h3>
+      <p>Price: {item.price} coins</p>
+      <button onClick={onPurchase} disabled={disabled}>
+        {disabled ? 'Owned' : 'Purchase'}
+      </button>
+    </div>
+  );
+};
+
+
+
+//style
 const styles: { [key: string]: React.CSSProperties } = {
   card: {
     border: '1px solid #000',
@@ -188,4 +220,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   }
 };
 
-export default DataCard;
+export { DataCard, ItemCards };

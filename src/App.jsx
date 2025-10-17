@@ -6,6 +6,7 @@ import { History } from "./pages/History.jsx";
 import { Profile } from './pages/profile.jsx';
 import { Layout } from "./components/Layout.js";
 import { Login } from "./components/login.jsx";
+import { Store } from "./pages/Store.tsx";
 import {RequireAuth} from './components/RequireAuth'
 
 
@@ -27,6 +28,7 @@ function App() {
           <Route path="/create-quests" element={<QuestCreator />} />
           <Route path="/history" element={<History />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/store" element={<Store/>}/>
         </Route>
       </Routes>
     </Router>
