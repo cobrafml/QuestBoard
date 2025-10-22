@@ -54,13 +54,13 @@ export function History() {
 
   return (
     <>
-      <h1>Completed or Failed Quests</h1>
+      <h1 style={{fontFamily: 'italiac'}} >Completed or Failed Quests</h1>
       {message && <p style={{ color: "red" }}>{message}</p>}
 
-      <div style={{ maxHeight: "300px", overflowY: "auto", border: "1px solid #444", borderRadius: "8px" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", tableLayout: "fixed", color: "#fff", fontSize: "14px" }}>
+      <div className="game-table-container">
+        <table className="game-table">
           <thead>
-            <tr style={{ backgroundColor: "#333" }}>
+            <tr>
               <th style={{ ...styles.th, ...styles.sticky }}>Title</th>
               <th style={{ ...styles.th, ...styles.sticky }}>Description</th>
               <th style={{ ...styles.th, ...styles.sticky }}>Status</th>
@@ -70,7 +70,7 @@ export function History() {
           <tbody>
             {quests.length > 0 ? (
               quests.map((q) => (
-                <tr key={q.id} style={{ borderBottom: "1px solid #555" }}>
+                <tr key={q.id}>
                   <td style={styles.td}>{q.Title}</td>
                   <td style={styles.td} title={q.Description}>
                     {q.Description.length > 20 ? q.Description.slice(0, 20) + "..." : q.Description}
@@ -78,15 +78,8 @@ export function History() {
                   <td style={styles.td}>{q.Status}</td>
                   <td style={styles.td}>
                     <button
+                      className="view-btn"
                       onClick={() => handleView(q)}
-                      style={{
-                        backgroundColor: "#4c0c77",
-                        color: "#fff",
-                        border: "none",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
                     >
                       View
                     </button>
@@ -104,24 +97,23 @@ export function History() {
         </table>
       </div>
 
-      {selectedQuest && (
-        <div style={modalStyles.overlay} onClick={closeModal}>
-          <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
-            <h2>{selectedQuest.Title}</h2>
-            <p><strong>Description:</strong></p>
-            <p style={modalStyles.value}>{selectedQuest.Description}</p>
-            <p><strong>Duration:</strong></p>
-            <p style={modalStyles.value}>{selectedQuest.Duration}</p>
-            <p><strong>XP:</strong></p>
-            <p style={modalStyles.value}>{selectedQuest.XP}</p>
-            <p><strong>Coins:</strong></p>
-            <p style={modalStyles.value}>{selectedQuest.Coins}</p>
-            <p><strong>Status:</strong></p>
-            <p style={modalStyles.value}>{selectedQuest.Status}</p>
-            <button onClick={closeModal} style={modalStyles.closeButton}>Close</button>
-          </div>
-        </div>
-      )}
+            
+{selectedQuest && (
+  <div style={modalStyles.overlay} onClick={closeModal}>
+    <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
+      <div style={cardStyles.container}>
+        <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
+        <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest.Description}</p>
+        <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest.Duration}</p>
+        <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.XP}</p>
+        <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.Coins}</p>
+        <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.Status}</p>
+      </div>
+      <button className = 'close-btn' style={modalStyles.closeButton} onClick={closeModal}>Close</button>
+    </div>
+  </div>
+)}
+
     </>
   );
 }
@@ -150,6 +142,27 @@ const styles = {
   },
 };
 
+const cardStyles = {
+  container: {
+    backgroundColor: "#2c2c2c",
+    borderRadius: "12px",
+    padding: "1.5rem",
+    boxShadow: "0 0 15px #6a0dad",
+    color: "#f0e6ff",
+    fontFamily: "initial",
+    marginBottom: "1rem",
+  },
+  title: {
+    fontFamily: "'Press Start 2P', cursive",
+    fontSize: "1.2rem",
+    color: "#8a2be2",
+    marginBottom: "1rem",
+  },
+  text: {
+    marginBottom: "0.8rem",
+    fontSize: "1rem",
+  },
+};
 const modalStyles = {
   overlay: {
     position: "fixed",
@@ -160,34 +173,41 @@ const modalStyles = {
     backgroundColor: "rgba(0,0,0,0.7)",
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    zIndex: 9999, // ✅ Fix: Modal above sticky header
   },
-  content: {
-    background: "#222",
-    color: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    maxWidth: "400px",
-    width: "90%",
-    wordBreak: "break-word",
-    overflowWrap: "break-word",
-    whiteSpace: "normal",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.5rem"
-  },
+  
+content: {
+  wordWrap: "break-word",
+  overflowWrap: "break-word",
+  whiteSpace: "normal", // fixed typo from "withsetSpace"
+  maxHeight: "80vh", // only one instance now
+  backgroundColor: "#1a1a1a",
+  padding: "2rem",
+  borderRadius: "12px",
+  maxWidth: "600px",
+  width: "90%",
+  overflowY: "auto",
+  boxShadow: "0 0 20px #6a0dad",
+  color: "#f0e6ff",
+  fontFamily: "initial",
+  textAlign: "center",
+}
+,
   value: {
     margin: "0 0 1rem 0",
     fontSize: "1rem",
-    color: "#ccc"
+    color: "#ccc",
   },
   closeButton: {
-    marginTop: "10px",
-    background: "#4c0c77",
+    marginTop: "20px",
+    background: "#6a0dad",
     color: "#fff",
     border: "none",
-    padding: "8px 12px",
-    borderRadius: "5px",
-    cursor: "pointer"
-  }
+    padding: "10px 20px",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "box-shadow 0.3s ease, background-color 0.3s ease",
+  },
 };

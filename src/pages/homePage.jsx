@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {DataCard} from "../components/cards";
+import { DataCard } from "../components/cards";
 import { supabase } from "../supabaseClient";
 
 export function Home() {
@@ -37,6 +37,7 @@ useEffect(() => {
         status: q.stateus,
         created_at: q.created_at,
         duration: q.duration,
+        doDate: q.doDate
         }));
 
         setQuests(formatted);
@@ -207,16 +208,18 @@ if (loading) return <p>Loading quests...</p>;
 
 return (
     <>
-    <h1>These are your active quests</h1>
+    <h1 style={{ fontFamily: "initial" }}>These are your active quests</h1>
     {message && <p style={{ color: "red" }}>{message}</p>}
 
+    {/*  Responsive flex layout */}
     <div
         style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-        gap: "2rem",
-        padding: "1rem",
-        alignItems: "start"
+        display: "flex",
+        flexWrap: "wrap",
+        gap: "20px",
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        justifyContent: "center",
+        padding: "20px",
         }}
     >
         {quests.length > 0 ? (
@@ -236,52 +239,93 @@ return (
         )}
     </div>
 
-    {selectedQuest && (
-        <div style={modalStyles.overlay} onClick={closeModal}>
-        <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
-            <h2>{selectedQuest.Title}</h2>
-            <p><strong>Description:</strong> {selectedQuest["Quest descript"]}</p>
-            <p><strong>Duration:</strong> {selectedQuest["Quest duration"]}</p>
-            <p><strong>XP:</strong> {selectedQuest.xp}</p>
-            <p><strong>Coins:</strong> {selectedQuest.coins}</p>
-            <p><strong>Status:</strong> {selectedQuest.status}</p>
-            <button onClick={closeModal} style={modalStyles.closeButton}>Close</button>
+    {/*  Modal styled like History page cards */}
+{selectedQuest && (
+    <div style={modalStyles.overlay} onClick={closeModal}>
+    <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
+        <div style={cardStyles.container}>
+        <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
+        <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest["Quest descript"]}</p>
+        <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest["Quest duration"]}</p>
+        <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.xp}</p>
+        <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.coins}</p>
+        <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.status}</p>
+        <p style={cardStyles.text}><strong>Due Date:</strong> {selectedQuest.doDate}</p> {/* ✅ Added */}
         </div>
-        </div>
-    )}
+        <button onClick={closeModal} style={modalStyles.closeButton}>Close</button>
+    </div>
+    </div>
+)}
     </>
 );
 }
 
+//  Card styles used inside the modal (same as History page)
+const cardStyles = {
+container: {
+    backgroundColor: "#2c2c2c", // Dark background
+    borderRadius: "12px",       // Rounded corners
+    padding: "1.5rem",          // Inner spacing
+    boxShadow: "0 0 15px #6a0dad", // Glowing purple border
+    color: "#f0e6ff",           // Light text color
+    fontFamily: "initial",      // Default font
+    marginBottom: "1rem",       // Space below card
+},
+title: {
+    fontFamily: "'Press Start 2P', cursive", // Pixel-style font
+    fontSize: "1.2rem",
+    color: "#8a2be2",         // Purple title
+    marginBottom: "1rem",
+    
+},
+text: {
+    marginBottom: "0.8rem",
+    fontSize: "1rem",
+},
+};
+
+// ✅ Modal wrapper and content styles
 const modalStyles = {
 overlay: {
-    position: "fixed",
+    position: "fixed",             // Covers entire screen
     top: 0,
     left: 0,
     width: "100%",
     height: "100%",
-    backgroundColor: "rgba(0,0,0,0.7)",
+    backgroundColor: "rgba(0,0,0,0.7)", // Semi-transparent dark background
     display: "flex",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    zIndex: 9999,                  // Ensures it's above everything
 },
 content: {
-    background: "#222",
-    color: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    maxWidth: "400px",
+    backgroundColor: "#1a1a1a",    // Dark modal box
+    padding: "2rem",
+    borderRadius: "12px",
+    maxWidth: "600px",
     width: "90%",
-    wordBreak: "break-word",
+    maxHeight: "80vh",            
+    boxShadow: "0 0 20px #6a0dad", // Glowing purple box
+    color: "#f0e6ff",
+    fontFamily: "initial",
+    textAlign: "center",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    overflowY: "auto", // ✅ Scroll if content is too long
+    wordWrap: "break-word", // ✅ Wrap long words
     overflowWrap: "break-word",
-    whiteSpace: "normal"
+
 },
 closeButton: {
-    marginTop: "10px",
-    background: "#4c0c77",
+    marginTop: "20px",
+    background: "#6a0dad",         // Purple background
     color: "#fff",
     border: "none",
-    padding: "8px 12px",
-    borderRadius: "5px"
-}
+    padding: "10px 20px",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "box-shadow 0.3s ease, background-color 0.3s ease",
+},
 };

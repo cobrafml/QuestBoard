@@ -26,13 +26,19 @@ const DataCard: React.FC<DataCardProps> = ({
   onFail,
   onEdit
 }) => {
+  // ✅ Limit description to 200 characters
+  const truncatedDescription =
+    item["Quest descript"].length > 200
+      ? item["Quest descript"].slice(0, 200) + "..."
+      : item["Quest descript"];
+
   return (
     <div style={styles.card} onClick={onView}>
       <h3 style={styles.title}>{item.Title}</h3>
 
       <div style={styles.infoBlock}>
         <p style={styles.label}>Description:</p>
-        <p style={styles.value}>{item["Quest descript"]}</p>
+        <p style={styles.value}>{truncatedDescription}</p>
       </div>
 
       <div style={styles.infoBlock}>
@@ -58,6 +64,7 @@ const DataCard: React.FC<DataCardProps> = ({
       <div style={styles.buttonRow}>
         {onComplete && (
           <button
+            className="close-btn"
             style={styles.completeButton}
             onClick={(e) => {
               e.stopPropagation();
@@ -68,6 +75,7 @@ const DataCard: React.FC<DataCardProps> = ({
           </button>
         )}
         <button
+          className="close-btn"
           style={styles.deleteButton}
           onClick={(e) => {
             e.stopPropagation();
@@ -82,6 +90,7 @@ const DataCard: React.FC<DataCardProps> = ({
         <div style={styles.buttonRow}>
           {onFail && (
             <button
+              className="close-btn"
               style={styles.failButton}
               onClick={(e) => {
                 e.stopPropagation();
@@ -93,6 +102,7 @@ const DataCard: React.FC<DataCardProps> = ({
           )}
           {onEdit && (
             <button
+              className="close-btn"
               style={styles.editButton}
               onClick={(e) => {
                 e.stopPropagation();
@@ -108,9 +118,7 @@ const DataCard: React.FC<DataCardProps> = ({
   );
 };
 
-
-// fore store
-
+// ✅ Store Item Card
 interface StoreItem {
   id: number;
   name: string;
@@ -126,97 +134,160 @@ interface StorePrompts {
 
 const ItemCards: React.FC<StorePrompts> = ({ item, onPurchase, disabled }) => {
   return (
-    <div className="card">
-      <img src={item.imageURL} alt={item.name} />
-      <h3>{item.name}</h3>
-      <p>Price: {item.price} coins</p>
-      <button onClick={onPurchase} disabled={disabled}>
+    <div style={styles.storeCard}>
+      <img src={item.imageURL} alt={item.name} style={styles.storeImage} />
+      <h3 style={styles.storeTitle}>{item.name}</h3>
+      <p style={styles.storePrice}>Price: {item.price} coins</p>
+      <button
+        className="close-btn"
+        style={styles.storeButton}
+        onClick={onPurchase}
+        disabled={disabled}
+      >
         {disabled ? 'Owned' : 'Purchase'}
       </button>
     </div>
   );
 };
 
+// ✅ Styles
+const buttonBase: React.CSSProperties = {
+  flex: 1,
+  padding: "10px 14px",
+  border: "2px solid #fff",
+  borderRadius: "8px",
+  cursor: "pointer",
+  fontWeight: "bold",
+  fontFamily: '"Cinzel", serif',
+  letterSpacing: "0.5px",
+  transition: "all 0.3s ease",
+  boxShadow: "0 4px 8px rgba(0,0,0,0.3)",
+  textTransform: "uppercase",
+};
 
-
-//style
 const styles: { [key: string]: React.CSSProperties } = {
   card: {
-    border: '1px solid #000',
-    borderRadius: '8px',
+    background: 'url("/assets/parchment-bg.png") center/cover no-repeat',
+    border: '2px solid #20ccd8ff',
+    borderRadius: '12px',
     padding: '1rem',
     margin: '0.5rem',
-    boxShadow: '0 5px 10px rgba(151, 81, 231, 1)',
-    backgroundColor: '#222',
-    color: '#fff',
-    width: '100%',
+    boxShadow: '0 0 15px rgba(0, 255, 136, 0.4)',
+    color: '#3b2f2f',
+    fontFamily: '"Cinzel", serif',
+    width: '350px',
+    minHeight: '450px',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     cursor: 'pointer',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
     overflow: 'hidden',
-    boxSizing: 'border-box'
   },
+
   title: {
     marginBottom: '0.8rem',
-    fontSize: '1.2rem',
+    fontSize: '1.5rem',
     fontWeight: 'bold',
-    wordBreak: 'break-word'
+    color: '#0fa14cff',
+    textShadow: '1px 1px 0 #22e9f0ff',
+    textAlign: 'center',
   },
+
   infoBlock: {
-    marginBottom: '0.8rem'
+    marginBottom: '0.6rem',
+    padding: '0.4rem',
+    borderRadius: '6px',
   },
+
   label: {
     fontWeight: 'bold',
-    marginBottom: '0.2rem'
+    marginBottom: '0.2rem',
+    color: '#2bd8c1ff',
   },
+
   value: {
     margin: 0,
-    color: '#ccc',
-    whiteSpace: 'nowrap',
+    color: '#42d6dbff',
+    fontStyle: 'italic',
+    display: '-webkit-box',
+    WebkitLineClamp: 4, // ✅ Show max 4 lines
+    WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    textOverflow: 'ellipsis',
   },
+
   buttonRow: {
     display: "flex",
     gap: "8px",
-    marginTop: "10px"
+    marginTop: "10px",
+    flexWrap: "wrap",
   },
+
   completeButton: {
-    flex: 1,
-    backgroundColor: "#4c0c77",
+    ...buttonBase,
+    background: "linear-gradient(135deg, #4c0c77, #6e48aa)",
     color: "#fff",
-    padding: "8px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer"
+    boxShadow:'0 0 15px rgba(0, 255, 136, 0.4)',
+    border:'2px solid #20ccd8ff',
   },
+
   deleteButton: {
-    flex: 1,
-    backgroundColor: "#04858a",
+    ...buttonBase,
+    background: "linear-gradient(135deg, #04858a, #06b6b2)",
     color: "#fff",
-    padding: "8px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer"
   },
+
   failButton: {
-    flex: 1,
-    backgroundColor: "#a00",
+    ...buttonBase,
+    background: "linear-gradient(135deg, #a00, #d33)",
     color: "#fff",
-    padding: "8px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer"
   },
+
   editButton: {
-    flex: 1,
-    backgroundColor: "#0a7",
+    ...buttonBase,
+    background: "linear-gradient(135deg, #0a7, #3ddc97)",
     color: "#fff",
-    padding: "8px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer"
+  },
+
+  storeCard: {
+    width: '250px',
+    minHeight: '320px',
+    background: '#fff',
+    borderRadius: '12px',
+    padding: '1rem',
+    margin: '0.5rem',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+    textAlign: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+
+  storeImage: {
+    width: '100%',
+    height: '150px',
+    objectFit: 'cover',
+    borderRadius: '8px',
+    marginBottom: '10px',
+  },
+
+  storeTitle: {
+    fontSize: '1.2rem',
+    fontWeight: 'bold',
+    marginBottom: '8px',
+  },
+
+  storePrice: {
+    fontSize: '1rem',
+    marginBottom: '12px',
+  },
+
+  storeButton: {
+    ...buttonBase,
+    background: "linear-gradient(135deg, #04858a, #06b6b2)",
+    color: "#fff",
+    width: '100%',
   }
 };
 
