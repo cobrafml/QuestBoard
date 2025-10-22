@@ -59,3 +59,73 @@ display: flex;
   margin-bottom: 30px;
 
 }
+
+.close-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.close-btn:hover {
+  background-color: #0056b3; /* Slightly darker blue */
+  box-shadow: 0 0 12px 4px #007bff; /*  Blue glow effect */
+  outline: 2px solid #007bff;       /* Optional outline */
+}
+
+/* style for the table*/
+
+.game-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 2px solid #6a0dad; /* Purple border for fantasy vibe */
+  border-radius: 12px;
+  background: linear-gradient(145deg, #1a1a1a, #2c2c2c);
+  box-shadow: 0 0 15px rgba(106, 13, 173, 0.6);
+}
+
+.game-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  color: #f0e6ff; /* Light purple text */
+  font-size: 14px;
+  font-family: 'Press Start 2P', cursive; /* Pixel/game font */
+}
+
+.game-table thead tr {
+  background-color: #3b0a57;
+  color: #fff;
+  text-transform: uppercase;
+  font-family: initial;
+}
+
+.game-table th,
+.game-table td {
+  padding: 10px;
+  text-align: center;
+  border-bottom: 1px solid #4c0c77;
+  font-family: initial;
+}
+
+
+
+.view-btn {
+  background-color: #6a0dad;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.view-btn:hover {
+  background-color: #8a2be2;
+  box-shadow: 0 0 10px #8a2be2;
+}

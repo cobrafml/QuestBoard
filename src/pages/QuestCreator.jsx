@@ -2,18 +2,26 @@ import { useState } from "react";
 import { supabase } from "../supabaseClient";
 
 export function QuestCreator() {
+// State variables for form inputs and feedback message
 const [title, setTitle] = useState("");
 const [description, setDescription] = useState("");
-const [duration, setDuration] = useState(1); // Default: One Day
+const [duration, setDuration] = useState(1);
 const [message, setMessage] = useState("");
 
+/**
+ * handleCreateQuest
+ * -----------------
+ * This function runs when the user clicks "Create Quest".
+ * It validates input, calculates XP and Coins, computes due date,
+ * adds created_at, and inserts the quest into the Supabase database.
+ */
 const handleCreateQuest = async () => {
     if (!title.trim() || !description.trim()) {
     setMessage("Please fill in all fields!");
     return;
     }
 
-    // XP and Coins calculation
+    // Calculate XP and Coins
     const baseXP = 100;
     const xpPerDay = 50;
     const xp = baseXP + duration * xpPerDay;
@@ -25,20 +33,28 @@ const handleCreateQuest = async () => {
     setMessage("You must be logged in to create a quest!");
     return;
     }
-
     const accountId = loggedInUser.id;
+
+    // Compute dates
+    const today = new Date().toISOString().split("T")[0]; // created_at
+    const doDateObj = new Date();
+    doDateObj.setDate(doDateObj.getDate() + duration);
+    const formattedDoDate = doDateObj.toISOString().split("T")[0]; // doDate
 
     // Prepare quest object
     const newQuest = {
     Title: title,
     Description: description,
-    duration: duration, // matches column name
+    duration: duration,
     accountID: accountId,
     XP: xp,
     Coins: coins,
-    stateus: "active", // ✅ set status to active
+    stateus: "active",
+    created_at: today,       // ✅ Add created_at
+    doDate: formattedDoDate, // ✅ Add due date
     };
 
+    // Insert quest into Supabase
     const { error } = await supabase.from("Quests").insert([newQuest]);
 
     if (error) {
@@ -51,11 +67,17 @@ const handleCreateQuest = async () => {
     }
 };
 
+/**
+ * Component Render
+ * ----------------
+ * Displays the quest creation form with fields for title, description,
+ * duration, and a button to create the quest. Shows feedback messages.
+ */
 return (
-    <div style={{ color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
+    <div style={{fontFamily:'initial', color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
     <h2 style={{ marginBottom: "20px" }}>Create Quest</h2>
 
-    {/* Title */}
+    {/* Title Input */}
     <div style={{ marginBottom: "15px" }}>
         <label style={{ display: "block", marginBottom: "8px" }}>Quest title</label>
         <input
@@ -66,7 +88,7 @@ return (
         />
     </div>
 
-    {/* Description */}
+    {/* Description Input */}
     <div style={{ marginBottom: "15px" }}>
         <label style={{ display: "block", marginBottom: "8px" }}>Quest description</label>
         <input
@@ -77,13 +99,13 @@ return (
         />
     </div>
 
-    {/* Duration */}
+    {/* Duration Selector */}
     <div style={{ marginBottom: "20px" }}>
         <label style={{ display: "block", marginBottom: "8px" }}>Duration (days)</label>
         <select
         value={duration}
         onChange={(e) => setDuration(Number(e.target.value))}
-        style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+        style={{ fontFamily:'initial', width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
         >
         <option value={0}>One Time (0 days)</option>
         <option value={1}>One Day</option>
@@ -92,8 +114,8 @@ return (
         </select>
     </div>
 
-    {/* Button */}
-    <button
+    {/* Create Quest Button */}
+    <button className="close-btn"
         style={{
         width: "100%",
         backgroundColor: "#4c0c77",
@@ -110,6 +132,7 @@ return (
         Create Quest
     </button>
 
+    {/* Feedback Message */}
     {message && <p style={{ marginTop: "10px", color: "#ccc" }}>{message}</p>}
     </div>
 );

@@ -17,23 +17,30 @@ const handleLogin = async () => {
     .from("Accounts")
     .select("*")
     .eq("Account name", username)
-    .eq("Passord", password)
+    .eq("Passord", password) // Matches your table column
     .single();
 
     if (error || !data) {
+    console.error("Login error:", error);
     setMessage("Invalid username or password.");
     } else {
-    sessionStorage.setItem("loggedInUser", JSON.stringify(data)); // ✅ Includes id
+    sessionStorage.setItem("loggedInUser", JSON.stringify(data));
     navigate("/");
     }
 };
 
 const handleCreateAccount = async () => {
     // Check if username exists
-    const { data: existing } = await supabase
+    const { data: existing, error: checkError } = await supabase
     .from("Accounts")
     .select("*")
     .eq("Account name", username);
+
+    if (checkError) {
+    console.error("Check username error:", checkError);
+    setMessage("Error checking username.");
+    return;
+    }
 
     if (existing && existing.length > 0) {
     setMessage("Username already exists.");
@@ -46,10 +53,9 @@ const handleCreateAccount = async () => {
     level: 1,
     XP: 0,
     Coins: 0,
-    streek: 0,
+    streak: 0,
     };
 
-    // ✅ Insert and fetch the inserted row (with id)
     const { data, error } = await supabase
     .from("Accounts")
     .insert([newProfile])
@@ -57,9 +63,10 @@ const handleCreateAccount = async () => {
     .single();
 
     if (error) {
-    setMessage("Error creating account.");
+    console.error("Insert error:", error);
+    setMessage(`Error creating account: ${error.message}`);
     } else {
-    sessionStorage.setItem("loggedInUser", JSON.stringify(data)); // ✅ Includes id
+    sessionStorage.setItem("loggedInUser", JSON.stringify(data));
     navigate("/");
     }
 };
