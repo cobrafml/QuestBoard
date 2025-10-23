@@ -92,7 +92,7 @@ return (
         </div>
     </div>
 
-    {/* ✅ Profile Image Selection */}
+    {/*  Profile Image Selection */}
     <div style={styles.badgesContainer}>
         <h3>Choose Your Profile Picture</h3>
         <div style={styles.badgesGrid}>
@@ -116,23 +116,92 @@ return (
         {updating && <p style={{ color: "yellow" }}>Updating profile picture...</p>}
     </div>
 
-    {/* ✅ Your existing badge section stays here */}
     <div style={styles.badgesContainer}>
         <h3>Your Badges</h3>
         <div style={styles.badgesGrid}>
-        {account.fiveQuest ? (
-            <img src={account.fiveQuest} alt="Five Quests" width="200" style={styles.image} />
-        ) : (
-            <span style={styles.notOwned}>Badge not owned</span>
-        )}
-        {/* Repeat your other badge checks here as you already have */}
+            
+            {account.fiveQuest ? (
+            <img
+                src={account.fiveQuest} //  Show badge image if owned
+                alt="Five Quests"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}
+    {account.tenQuest ? (
+            <img
+                src={account.tenQuest} //  Show badge image if owned
+                alt="Tens quests"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}{account.twentyQuest ? (
+            <img
+                src={account.twentyQuest} //  Show badge image if owned
+                alt="twentyQuest"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}{account.fiveWeek ? (
+            <img
+                src={account.fiveWeek} //  Show badge image if owned
+                alt="Five Weeks"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}{account.tenWeek ? (
+            <img
+                src={account.tenWeek} //  Show badge image if owned
+                alt="Ten Week"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}{account.treeMonth ? (
+            <img
+                src={account.treeMonth} //  Show badge image if owned
+                alt="treeMonth"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}{account.sixMonth ? (
+            <img
+                src={account.sixMonth} //  Show badge image if owned
+                alt="six Month"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}
+    {account.twelvMonth ? (
+            <img
+                src={account.twelvMonth} //  Show badge image if owned
+                alt="twelvMonth"
+                width="200"
+                style={styles.image}
+            />
+    ) : (
+      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    )}
         </div>
     </div>
     </>
 );
 }
 
-// ✅ Styles
+//  Styles
 const styles = {
 container: {
     display: "flex",
@@ -141,8 +210,10 @@ container: {
     padding: "1rem",
     backgroundColor: "#333",
     color: "#fff",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    
 },
+
 image: {
     borderRadius: "8px",
     boxShadow: "0 4px 8px rgba(0,0,0,0.5)"
@@ -151,14 +222,17 @@ info: {
     display: "flex",
     flexDirection: "column",
     gap: "0.5rem",
-    fontSize: "1rem"
+    fontSize: "1rem",
+    fontFamily: "initial",
+    
 },
 badgesContainer: {
     marginTop: "2rem",
     padding: "1rem",
     backgroundColor: "#333",
     borderRadius: "8px",
-    color: "#fff"
+    color: "#fff",
+    fontFamily: "initial",
 },
 badgesGrid: {
     display: "flex",
@@ -185,6 +259,7 @@ badgeImage: {
 notOwned: {
     fontSize: "0.8rem",
     color: "#aaa",
-    textAlign: "center"
+    textAlign: "center",
+    fontFamily: "initial",
 }
 };
