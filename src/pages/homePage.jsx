@@ -78,7 +78,7 @@ const handleComplete = async (index) => {
 
     const { data: accountData, error: accountError } = await supabase
         .from("Accounts")
-        .select("XP, Coins, streak")
+        .select("XP, Coins, streak, weekstreak, monthstreek, level, fiveQuest, tenQuest, twentyQuest, fiveWeek, tenWeek, treeMonth, sixMonth, twelvMonth")
         .eq("id", loggedInUser.id)
         .single();
 
@@ -87,14 +87,63 @@ const handleComplete = async (index) => {
     let updatedXP = accountData.XP;
     let updatedCoins = accountData.Coins;
     let updatedStreak = accountData.streak;
+    let updatedWeekStreak = accountData.weekstreak;
+    let updateMonthStreek = accountData.monthstreek;
+    let updateLevel = accountData.level;
+    
+    // prep badge updates
+    const badgeUpdates = {};
 
     if (newStatus === "completed") {
         updatedXP += parseInt(quest.xp);
         updatedCoins += parseInt(quest.coins);
         updatedStreak += 1;
+
+        if(quest.duration===7){
+            updatedWeekStreak +=1;
+        }
+        if(quest.duration === 30){
+            updateMonthStreek += 1;
+        }
+        
+    const { data: badgeData, error: badgeError } = await supabase
+        .from("badges")
+        .select("*")
+        .single();
+        if (badgeError) throw badgeError;
+
+      // Quest streak badges
+        if (updatedStreak >= 5 && !accountData["fiveQuest"]) badgeUpdates["fiveQuest"] = badgeData["5quests"];
+        if (updatedStreak >= 10 && !accountData["tenQuest"]) badgeUpdates["tenQuest"] = badgeData["10quests"];
+        if (updatedStreak >= 20 && !accountData["twentyQuest"]) badgeUpdates["twentyQuest"] = badgeData["20quests"];
+
+      // Weekly streak badges
+        if (updatedWeekStreak >= 5 && !accountData["fiveWeek"]) badgeUpdates["fiveWeek"] = badgeData["5weekly"];
+        if (updatedWeekStreak >= 10 && !accountData["tenWeek"]) badgeUpdates["tenWeek"] = badgeData["10weekly"];
+
+      // Monthly streak badges
+        if (updateMonthStreek >= 3 && !accountData["treeMonth"]) badgeUpdates["treeMonth"] = badgeData["3month"];
+        if (updateMonthStreek >= 6 && !accountData["sixMonth"]) badgeUpdates["sixMonth"] = badgeData["6month"];
+        if (updateMonthStreek >= 12 && !accountData["twelvMonth"]) badgeUpdates["twelvMonth"] = badgeData["12month"];
+
     } else {
         updatedStreak = 0;
     }
+
+
+    
+    const {data: levelData, levelError} = await supabase
+    .from("levels")
+    .select("levelNr,xpRequierd")
+    .order("levelNr",{ascending:true});
+    
+    if(levelError) throw levelError;
+    for(let i = 0; i< levelData.length;i++){
+        const levelInfo = levelData[i];
+        if(updatedXP >= levelInfo.xpRequierd && levelInfo.levelNr > updateLevel){
+            updateLevel = levelInfo.levelNr
+        }
+        }
 
     const { error: updateError } = await supabase
         .from("Accounts")
@@ -102,6 +151,10 @@ const handleComplete = async (index) => {
         XP: updatedXP,
         Coins: updatedCoins,
         streak: updatedStreak,
+        weekstreak: updatedWeekStreak,
+        monthstreek: updateMonthStreek,
+        level: updateLevel,
+        ...badgeUpdates
         })
         .eq("id", loggedInUser.id);
 
@@ -113,6 +166,8 @@ const handleComplete = async (index) => {
     } catch (err) {
     setMessage("Error updating quest: " + err.message);
     }
+    
+    
 };
 
 const handleFail = async (index) => {
@@ -284,7 +339,7 @@ text: {
 },
 };
 
-// ✅ Modal wrapper and content styles
+// Modal wrapper and content styles
 const modalStyles = {
 overlay: {
     position: "fixed",             // Covers entire screen
