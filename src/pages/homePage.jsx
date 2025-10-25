@@ -8,79 +8,115 @@ const [selectedQuest, setSelectedQuest] = useState(null);
 const [loading, setLoading] = useState(true);
 const [message, setMessage] = useState("");
 
+const [account, setAccount] = useState(null);
+const [loadingAccount, setLoadingAccount] = useState(true);
+
+const fetchAccount = async () => {
+        const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
+
+        if (!loggedInUser) {
+        setLoadingAccount(false);
+        return;
+        }
+
+        const { data, error } = await supabase
+        .from("Accounts")
+        .select("*")
+        .eq("id", loggedInUser.id)
+        .single();
+
+        if (!error) setAccount(data);
+        setLoadingAccount(false);
+    };
+
 useEffect(() => {
-    const fetchQuests = async () => {
+const fetchQuests = async () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
 
     if (!loggedInUser) {
-        setMessage("You must be logged in to view quests.");
-        setLoading(false);
-        return;
+    setMessage("You must be logged in to view quests.");
+    setLoading(false);
+    return;
     }
 
     try {
-        const { data, error } = await supabase
+    const { data, error } = await supabase
         .from("Quests")
         .select("*")
         .eq("accountID", loggedInUser.id)
         .eq("stateus", "active");
 
-        if (error) throw error;
+    if (error) throw error;
 
-        const formatted = data.map((q) => ({
-        id: q.id,
-        Title: q.Title,
-        "Quest descript": q.Description,
-        "Quest duration": `${q.duration} days`,
-        xp: q.XP.toString(),
-        coins: q.Coins.toString(),
-        status: q.stateus,
-        created_at: q.created_at,
-        duration: q.duration,
-        doDate: q.doDate
-        }));
+    const today = new Date();
 
-        setQuests(formatted);
+    const formatted = data
+        .map((q) => {
+        const createdDate = new Date(q.created_at);
+        const daysPassed = Math.floor((today - createdDate) / (1000 * 60 * 60 * 24));
+        const remainingDuration = Math.max(q.duration - daysPassed, 0); // prevent negative
+
+        return {
+            id: q.id,
+            Title: q.Title,
+            "Quest descript": q.Description,
+            "Quest duration": `${remainingDuration} days left`,
+            xp: q.XP.toString(),
+            coins: q.Coins.toString(),
+            status: q.stateus,
+            created_at: q.created_at,
+            duration: remainingDuration,
+            originalDuration: q.duration,
+            doDate: q.doDate
+        };
+        })
+        .sort((a, b) => a.duration - b.duration); // Sort by shortest remaining duration
+
+    setQuests(formatted);
     } catch (err) {
-        setMessage("Error fetching quests: " + err.message);
+    setMessage("Error fetching quests: " + err.message);
     } finally {
-        setLoading(false);
+    setLoading(false);
     }
-    };
+};
 
-    fetchQuests();
+    fetchAccount();
+
+fetchQuests();
 }, []);
 
 const handleComplete = async (index) => {
-    const quest = quests[index];
-    if (!quest) return;
+const quest = quests[index];
+if (!quest) return;
 
-    const now = new Date();
-    const createdDate = new Date(quest.created_at);
-    const allowedMs = quest.duration * 24 * 60 * 60 * 1000;
-    const isExpired = now.getTime() - createdDate.getTime() > allowedMs;
+const now = new Date();
+const createdDate = new Date(quest.created_at);
+const allowedMs = quest.originalDuration * 24 * 60 * 60 * 1000; // ✅ use original duration
+const isExpired = now.getTime() - createdDate.getTime() > allowedMs;
 
-    const newStatus = isExpired ? "failed" : "completed";
+const newStatus = isExpired ? "failed" : "completed";
 
-    const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
-    if (!loggedInUser) {
+const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
+if (!loggedInUser) {
     setMessage("User not found.");
     return;
-    }
+}
 
-    try {
+try {
+    // ✅ Update quest status
     const { error: questError } = await supabase
-        .from("Quests")
-        .update({ stateus: newStatus })
-        .eq("id", quest.id);
+    .from("Quests")
+    .update({ stateus: newStatus })
+    .eq("id", quest.id);
 
     if (questError) throw questError;
 
+    // ✅ Fetch account data
     const { data: accountData, error: accountError } = await supabase
-        .from("Accounts")
-        .select("XP, Coins, streak, weekstreak, monthstreek, level, fiveQuest, tenQuest, twentyQuest, fiveWeek, tenWeek, treeMonth, sixMonth, twelvMonth")
-        .eq("id", loggedInUser.id)
-        .single();
+    .from("Accounts")
+    .select("XP, Coins, streak, weekstreak, monthstreek, level, fiveQuest, tenQuest, twentyQuest, fiveWeek, tenWeek, treeMonth, sixMonth, twelvMonth")
+    .eq("id", loggedInUser.id)
+    .single();
 
     if (accountError) throw accountError;
 
@@ -90,64 +126,60 @@ const handleComplete = async (index) => {
     let updatedWeekStreak = accountData.weekstreak;
     let updateMonthStreek = accountData.monthstreek;
     let updateLevel = accountData.level;
-    
-    // prep badge updates
+
     const badgeUpdates = {};
 
     if (newStatus === "completed") {
-        updatedXP += parseInt(quest.xp);
-        updatedCoins += parseInt(quest.coins);
-        updatedStreak += 1;
+    updatedXP += parseInt(quest.xp);
+    updatedCoins += parseInt(quest.coins);
+    updatedStreak += 1;
 
-        if(quest.duration===7){
-            updatedWeekStreak +=1;
-        }
-        if(quest.duration === 30){
-            updateMonthStreek += 1;
-        }
-        
+    if (quest.originalDuration === 7) updatedWeekStreak += 1;
+    if (quest.originalDuration === 30) updateMonthStreek += 1;
+
+    // Fetch badge data
     const { data: badgeData, error: badgeError } = await supabase
         .from("badges")
         .select("*")
         .single();
-        if (badgeError) throw badgeError;
+    if (badgeError) throw badgeError;
 
-      // Quest streak badges
-        if (updatedStreak >= 5 && !accountData["fiveQuest"]) badgeUpdates["fiveQuest"] = badgeData["5quests"];
-        if (updatedStreak >= 10 && !accountData["tenQuest"]) badgeUpdates["tenQuest"] = badgeData["10quests"];
-        if (updatedStreak >= 20 && !accountData["twentyQuest"]) badgeUpdates["twentyQuest"] = badgeData["20quests"];
+    // Quest streak badges
+    if (updatedStreak >= 5 && !accountData["fiveQuest"]) badgeUpdates["fiveQuest"] = badgeData["5quests"];
+    if (updatedStreak >= 10 && !accountData["tenQuest"]) badgeUpdates["tenQuest"] = badgeData["10quests"];
+    if (updatedStreak >= 20 && !accountData["twentyQuest"]) badgeUpdates["twentyQuest"] = badgeData["20quests"];
 
-      // Weekly streak badges
-        if (updatedWeekStreak >= 5 && !accountData["fiveWeek"]) badgeUpdates["fiveWeek"] = badgeData["5weekly"];
-        if (updatedWeekStreak >= 10 && !accountData["tenWeek"]) badgeUpdates["tenWeek"] = badgeData["10weekly"];
+    // Weekly streak badges
+    if (updatedWeekStreak >= 5 && !accountData["fiveWeek"]) badgeUpdates["fiveWeek"] = badgeData["5weekly"];
+    if (updatedWeekStreak >= 10 && !accountData["tenWeek"]) badgeUpdates["tenWeek"] = badgeData["10weekly"];
 
-      // Monthly streak badges
-        if (updateMonthStreek >= 3 && !accountData["treeMonth"]) badgeUpdates["treeMonth"] = badgeData["3month"];
-        if (updateMonthStreek >= 6 && !accountData["sixMonth"]) badgeUpdates["sixMonth"] = badgeData["6month"];
-        if (updateMonthStreek >= 12 && !accountData["twelvMonth"]) badgeUpdates["twelvMonth"] = badgeData["12month"];
-
+    // Monthly streak badges
+    if (updateMonthStreek >= 3 && !accountData["treeMonth"]) badgeUpdates["treeMonth"] = badgeData["3month"];
+    if (updateMonthStreek >= 6 && !accountData["sixMonth"]) badgeUpdates["sixMonth"] = badgeData["6month"];
+    if (updateMonthStreek >= 12 && !accountData["twelvMonth"]) badgeUpdates["twelvMonth"] = badgeData["12month"];
     } else {
-        updatedStreak = 0;
+    updatedStreak = 0;
     }
 
-
-    
-    const {data: levelData, levelError} = await supabase
+    // Level calculation
+    const { data: levelData, error: levelError } = await supabase
     .from("levels")
     .select("levelNr,xpRequierd")
-    .order("levelNr",{ascending:true});
-    
-    if(levelError) throw levelError;
-    for(let i = 0; i< levelData.length;i++){
-        const levelInfo = levelData[i];
-        if(updatedXP >= levelInfo.xpRequierd && levelInfo.levelNr > updateLevel){
-            updateLevel = levelInfo.levelNr
-        }
-        }
+    .order("levelNr", { ascending: true });
 
+    if (levelError) throw levelError;
+
+    for (let i = 0; i < levelData.length; i++) {
+    const levelInfo = levelData[i];
+    if (updatedXP >= levelInfo.xpRequierd && levelInfo.levelNr > updateLevel) {
+        updateLevel = levelInfo.levelNr;
+    }
+    }
+
+    // Update account
     const { error: updateError } = await supabase
-        .from("Accounts")
-        .update({
+    .from("Accounts")
+    .update({
         XP: updatedXP,
         Coins: updatedCoins,
         streak: updatedStreak,
@@ -155,19 +187,19 @@ const handleComplete = async (index) => {
         monthstreek: updateMonthStreek,
         level: updateLevel,
         ...badgeUpdates
-        })
-        .eq("id", loggedInUser.id);
+    })
+    .eq("id", loggedInUser.id);
 
     if (updateError) throw updateError;
 
+    // Update UI
     const updated = [...quests];
     updated[index].status = newStatus;
     setQuests(updated.filter((q) => q.status === "active"));
-    } catch (err) {
+} catch (err) {
     setMessage("Error updating quest: " + err.message);
-    }
-    
-    
+}
+await fetchAccount();
 };
 
 const handleFail = async (index) => {
@@ -201,6 +233,7 @@ const handleFail = async (index) => {
     } catch (err) {
     setMessage("Error failing quest: " + err.message);
     }
+    await fetchAccount();
 };
 
 const handleEdit = async (index) => {
@@ -262,24 +295,65 @@ const closeModal = () => setSelectedQuest(null);
 if (loading) return <p>Loading quests...</p>;
 
 return (
-    <>
+<>
+    
+{/* Account Info Section */}
+    {account && (
+    <div style={styles.infoBox}>
+        <h2 style={{ fontFamily: "initial" }}>Your Stats</h2>
+        <p><strong>Level:</strong> {account.level}</p>
+        <p><strong>XP:</strong> {account.XP}</p>
+        <p><strong>Coins:</strong> {account.Coins}</p>
+        <p><strong>Streak:</strong> {account.streak} quests</p>
+        <p><strong>Today:</strong> {new Date().toLocaleDateString("en-SE", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric"
+        })}</p>
+
+        {/* Badges */}
+        <div style={styles.badgesContainer}>
+        <h3>Your Badges</h3>
+        <div style={styles.badgesGrid}>
+            {[
+            "fiveQuest", "tenQuest", "twentyQuest",
+            "fiveWeek", "tenWeek", "treeMonth",
+            "sixMonth", "twelvMonth"
+            ].map((key) =>
+            account[key] ? (
+                <img
+                key={key}
+                src={account[key]}
+                alt={key}
+                style={styles.badgeImage}
+                />
+            ) : (
+                <span key={key} style={styles.notOwned}>Badge not owned</span>
+            )
+            )}
+        </div>
+        </div>
+    </div>
+    )}
+
+
+    {/* Active Quests Section */}
     <h1 style={{ fontFamily: "initial" }}>These are your active quests</h1>
     {message && <p style={{ color: "red" }}>{message}</p>}
 
-    {/*  Responsive flex layout */}
     <div
-        style={{
+    style={{
         display: "flex",
         flexWrap: "wrap",
         gap: "20px",
-        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
         justifyContent: "center",
         padding: "20px",
-        }}
+    }}
     >
-        {quests.length > 0 ? (
+    {quests.length > 0 ? (
         quests.map((item, index) => (
-            <DataCard
+        <DataCard
             key={item.id}
             item={item}
             onDelete={() => handleDelete(index)}
@@ -287,31 +361,31 @@ return (
             onView={() => handleView(item)}
             onFail={() => handleFail(index)}
             onEdit={() => handleEdit(index)}
-            />
+        />
         ))
-        ) : (
+    ) : (
         <p>No active quests found.</p>
-        )}
+    )}
     </div>
 
-    {/*  Modal styled like History page cards */}
-{selectedQuest && (
+    {/* Modal for Selected Quest */}
+    {selectedQuest && (
     <div style={modalStyles.overlay} onClick={closeModal}>
-    <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
+        <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
         <div style={cardStyles.container}>
-        <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
-        <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest["Quest descript"]}</p>
-        <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest["Quest duration"]}</p>
-        <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.xp}</p>
-        <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.coins}</p>
-        <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.status}</p>
-        <p style={cardStyles.text}><strong>Due Date:</strong> {selectedQuest.doDate}</p> {/* ✅ Added */}
+            <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
+            <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest["Quest descript"]}</p>
+            <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest["Quest duration"]}</p>
+            <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.xp}</p>
+            <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.coins}</p>
+            <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.status}</p>
+            <p style={cardStyles.text}><strong>Due Date:</strong> {selectedQuest.doDate}</p>
         </div>
         <button onClick={closeModal} style={modalStyles.closeButton}>Close</button>
+        </div>
     </div>
-    </div>
-)}
-    </>
+    )}
+</>
 );
 }
 
@@ -383,4 +457,48 @@ closeButton: {
     cursor: "pointer",
     transition: "box-shadow 0.3s ease, background-color 0.3s ease",
 },
+};
+const styles = {
+infoBox: {
+    padding: "1rem",
+    backgroundColor: "#222",
+    color: "#fff",
+    borderRadius: "8px",
+    marginBottom: "2rem",
+    fontFamily: "initial",
+    textAlign: "center"
+},
+badgesContainer: {
+    marginTop: "1rem",
+    padding: "1rem",
+    backgroundColor: "#333",
+    borderRadius: "8px",
+    color: "#fff"
+},
+badgesGrid: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "1rem",
+    justifyContent: "center",
+    marginTop: "1rem"
+},
+badgeImage: {
+    width: "80px",
+    height: "80px",
+    objectFit: "cover",
+    borderRadius: "8px",
+    boxShadow: "0 4px 8px rgba(0,0,0,0.5)"
+},
+notOwned: {
+    fontSize: "0.8rem",
+    color: "#aaa",
+    textAlign: "center",
+    width: "80px",
+    height: "80px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#444",
+    borderRadius: "8px"
+}
 };

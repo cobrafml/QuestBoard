@@ -36,7 +36,7 @@ useEffect(() => {
     fetchAccount();
 }, []);
 
-// ✅ Update profile picture
+//  Update profile picture
 const handleSetProfileImage = async (imageUrl) => {
     if (!imageUrl || imageUrl === account.inuse) return;
     setUpdating(true);
@@ -61,7 +61,7 @@ if (loading) return <p>Loading profile...</p>;
 if (message) return <p>{message}</p>;
 if (!account) return <p>No account data found.</p>;
 
-// ✅ Collect purchased images
+//  Collect purchased images
 const purchasedImages = [
     account.image1,
     account.image2,
@@ -75,7 +75,7 @@ return (
     <div style={styles.container}>
         {/* Profile picture */}
         <img
-        src={account.inuse || "/images/default-profile.png"}
+        src={account.inuse}
         alt="Profile"
         width="200"
         style={styles.image}
