@@ -10,10 +10,6 @@ const [message, setMessage] = useState("");
 
 /**
  * handleCreateQuest
- * -----------------
- * This function runs when the user clicks "Create Quest".
- * It validates input, calculates XP and Coins, computes due date,
- * adds created_at, and inserts the quest into the Supabase database.
  */
 const handleCreateQuest = async () => {
     if (!title.trim() || !description.trim()) {
@@ -50,8 +46,8 @@ const handleCreateQuest = async () => {
     XP: xp,
     Coins: coins,
     stateus: "active",
-    created_at: today,       // ✅ Add created_at
-    doDate: formattedDoDate, // ✅ Add due date
+    created_at: today,       
+    doDate: formattedDoDate, // Add due date
     };
 
     // Insert quest into Supabase
@@ -69,9 +65,6 @@ const handleCreateQuest = async () => {
 
 /**
  * Component Render
- * ----------------
- * Displays the quest creation form with fields for title, description,
- * duration, and a button to create the quest. Shows feedback messages.
  */
 return (
     <div style={{fontFamily:'initial', color: "white", background: "#222", padding: "20px", borderRadius: "8px" }}>
