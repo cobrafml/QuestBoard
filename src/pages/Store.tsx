@@ -1,77 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { supabase } from '../supabaseClient';
+import { supabase } from '../supabaseClient.js';
 import type { CSSProperties } from 'react';
 
-interface StoreItem {
-id: number;
-name: string;
-price: number;
-imageURL: string;
-}
-
-interface ItemCardProps {
-item: StoreItem;
-onPurchase: () => void;
-disabled: boolean;
-}
-
-const cardStyles: {
-container: CSSProperties;
-title: CSSProperties;
-text: CSSProperties;
-image: CSSProperties;
-button: CSSProperties;
-disabled: CSSProperties;
-} = {
-container: {
-    backgroundColor: "#2c2c2c",
-    borderRadius: "12px",
-    padding: "1.5rem",
-    boxShadow: "0 0 15px #6a0dad",
-    color: "#f0e6ff",
-    fontFamily: "initial",
-    textAlign: "center",
-    width: "220px",
-    height: "320px", // ✅ Fixed height for uniformity
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "space-between",
-    opacity: 1,
-    transition: "transform 0.2s ease",
-},
-title: {
-    fontFamily: "'Press Start 2P', cursive",
-    fontSize: "1rem",
-    color: "#8a2be2",
-    marginBottom: "0.5rem",
-},
-text: {
-    fontSize: "0.9rem",
-    marginBottom: "0.5rem",
-},
-image: {
-    width: "100%",
-    height: "120px", // ✅ Fixed image height
-    objectFit: "cover",
-    borderRadius: "8px",
-    marginBottom: "1rem",
-},
-button: {
-    background: "#6a0dad",
-    color: "#fff",
-    border: "none",
-    padding: "8px 16px",
-    borderRadius: "8px",
-    fontWeight: "bold",
-    cursor: "pointer",
-    transition: "box-shadow 0.3s ease, background-color 0.3s ease",
-},
-disabled: {
-    backgroundColor: "#555",
-    cursor: "not-allowed",
-    opacity: 0.6,
-},
-};
 
 const ItemCards: React.FC<ItemCardProps> = ({ item, onPurchase, disabled }) => {
 return (
@@ -210,4 +140,74 @@ return (
     </div>
     </div>
 );
+};
+interface StoreItem {
+id: number;
+name: string;
+price: number;
+imageURL: string;
+}
+
+interface ItemCardProps {
+item: StoreItem;
+onPurchase: () => void;
+disabled: boolean;
+}
+
+const cardStyles: {
+container: CSSProperties;
+title: CSSProperties;
+text: CSSProperties;
+image: CSSProperties;
+button: CSSProperties;
+disabled: CSSProperties;
+} = {
+container: {
+    backgroundColor: "#2c2c2c",
+    borderRadius: "12px",
+    padding: "1.5rem",
+    boxShadow: "0 0 15px #6a0dad",
+    color: "#f0e6ff",
+    fontFamily: "initial",
+    textAlign: "center",
+    width: "220px",
+    height: "320px", // Fixed height for uniformity
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    opacity: 1,
+    transition: "transform 0.2s ease",
+},
+title: {
+    fontFamily: "'Press Start 2P', cursive",
+    fontSize: "1rem",
+    color: "#8a2be2",
+    marginBottom: "0.5rem",
+},
+text: {
+    fontSize: "0.9rem",
+    marginBottom: "0.5rem",
+},
+image: {
+    width: "100%",
+    height: "120px", // Fixed image height
+    objectFit: "cover",
+    borderRadius: "8px",
+    marginBottom: "1rem",
+},
+button: {
+    background: "#6a0dad",
+    color: "#fff",
+    border: "none",
+    padding: "8px 16px",
+    borderRadius: "8px",
+    fontWeight: "bold",
+    cursor: "pointer",
+    transition: "box-shadow 0.3s ease, background-color 0.3s ease",
+},
+disabled: {
+    backgroundColor: "#555",
+    cursor: "not-allowed",
+    opacity: 0.6,
+},
 };

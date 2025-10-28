@@ -392,18 +392,18 @@ return (
 //  Card styles used inside the modal (same as History page)
 const cardStyles = {
 container: {
-    backgroundColor: "#2c2c2c", // Dark background
+    backgroundColor: "#2c2c2c", 
     borderRadius: "12px",       // Rounded corners
-    padding: "1.5rem",          // Inner spacing
-    boxShadow: "0 0 15px #6a0dad", // Glowing purple border
-    color: "#f0e6ff",           // Light text color
-    fontFamily: "initial",      // Default font
-    marginBottom: "1rem",       // Space below card
+    padding: "1.5rem",          
+    boxShadow: "0 0 15px #6a0dad", 
+    color: "#f0e6ff",           
+    fontFamily: "initial",     
+    marginBottom: "1rem",       
 },
 title: {
-    fontFamily: "'Press Start 2P', cursive", // Pixel-style font
+    fontFamily: "italial", 
     fontSize: "1.2rem",
-    color: "#8a2be2",         // Purple title
+    color: "#8a2be2",         
     marginBottom: "1rem",
     
 },
@@ -428,27 +428,28 @@ overlay: {
     zIndex: 9999,                  // Ensures it's above everything
 },
 content: {
-    backgroundColor: "#1a1a1a",    // Dark modal box
+    backgroundColor: "#1a1a1a",    
     padding: "2rem",
     borderRadius: "12px",
     maxWidth: "600px",
     width: "90%",
     maxHeight: "80vh",            
-    boxShadow: "0 0 20px #6a0dad", // Glowing purple box
+    boxShadow: "0 0 20px #6a0dad", 
     color: "#f0e6ff",
     fontFamily: "initial",
     textAlign: "center",
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-between",
-    overflowY: "auto", // ✅ Scroll if content is too long
-    wordWrap: "break-word", // ✅ Wrap long words
+    overflowY: "auto", //  Scroll if content is too long
+    wordWrap: "break-word", //  Wrap long words
     overflowWrap: "break-word",
+    
 
 },
 closeButton: {
     marginTop: "20px",
-    background: "#6a0dad",         // Purple background
+    background: "#6a0dad",         
     color: "#fff",
     border: "none",
     padding: "10px 20px",

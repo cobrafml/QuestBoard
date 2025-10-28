@@ -8,6 +8,7 @@ export function History() {
   const [selectedQuest, setSelectedQuest] = useState(null);
 
   useEffect(() => {
+    //Filter for completed or failed quests
     const fetchHistory = async () => {
       const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
 
@@ -53,7 +54,7 @@ export function History() {
   if (loading) return <p>Loading history...</p>;
 
   return (
-    <>
+    <>{/*Normal table to show history*/}
       <h1 style={{fontFamily: 'italiac'}} >Completed or Failed Quests</h1>
       {message && <p style={{ color: "red" }}>{message}</p>}
 
@@ -97,22 +98,22 @@ export function History() {
         </table>
       </div>
 
-            
-{selectedQuest && (
-  <div style={modalStyles.overlay} onClick={closeModal}>
-    <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
-      <div style={cardStyles.container}>
-        <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
-        <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest.Description}</p>
-        <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest.Duration}</p>
-        <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.XP}</p>
-        <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.Coins}</p>
-        <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.Status}</p>
+  {/*Vew mode*/}
+  {selectedQuest && (
+    <div style={modalStyles.overlay} onClick={closeModal}>
+      <div style={modalStyles.content} onClick={(e) => e.stopPropagation()}>
+        <div style={cardStyles.container}>
+          <h2 style={cardStyles.title}>{selectedQuest.Title}</h2>
+          <p style={cardStyles.text}><strong>Description:</strong> {selectedQuest.Description}</p>
+          <p style={cardStyles.text}><strong>Duration:</strong> {selectedQuest.Duration}</p>
+          <p style={cardStyles.text}><strong>XP:</strong> {selectedQuest.XP}</p>
+          <p style={cardStyles.text}><strong>Coins:</strong> {selectedQuest.Coins}</p>
+          <p style={cardStyles.text}><strong>Status:</strong> {selectedQuest.Status}</p>
+        </div>
+        <button className = 'close-btn' style={modalStyles.closeButton} onClick={closeModal}>Close</button>
       </div>
-      <button className = 'close-btn' style={modalStyles.closeButton} onClick={closeModal}>Close</button>
     </div>
-  </div>
-)}
+  )}
 
     </>
   );
@@ -174,7 +175,7 @@ const modalStyles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 9999, // ✅ Fix: Modal above sticky header
+    zIndex: 9999, 
   },
   
 content: {

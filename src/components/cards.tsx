@@ -26,7 +26,7 @@ const DataCard: React.FC<DataCardProps> = ({
   onFail,
   onEdit
 }) => {
-  // ✅ Limit description to 200 characters
+  //  Limit description to 200 characters
   const truncatedDescription =
     item["Quest descript"].length > 200
       ? item["Quest descript"].slice(0, 200) + "..."
@@ -118,39 +118,8 @@ const DataCard: React.FC<DataCardProps> = ({
   );
 };
 
-// ✅ Store Item Card
-interface StoreItem {
-  id: number;
-  name: string;
-  price: number;
-  imageURL: string;
-}
 
-interface StorePrompts {
-  item: StoreItem;
-  onPurchase: () => void;
-  disabled?: boolean;
-}
-
-const ItemCards: React.FC<StorePrompts> = ({ item, onPurchase, disabled }) => {
-  return (
-    <div style={styles.storeCard}>
-      <img src={item.imageURL} alt={item.name} style={styles.storeImage} />
-      <h3 style={styles.storeTitle}>{item.name}</h3>
-      <p style={styles.storePrice}>Price: {item.price} coins</p>
-      <button
-        className="close-btn"
-        style={styles.storeButton}
-        onClick={onPurchase}
-        disabled={disabled}
-      >
-        {disabled ? 'Owned' : 'Purchase'}
-      </button>
-    </div>
-  );
-};
-
-// ✅ Styles
+//  Styles
 const buttonBase: React.CSSProperties = {
   flex: 1,
   padding: "10px 14px",
@@ -211,7 +180,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#42d6dbff',
     fontStyle: 'italic',
     display: '-webkit-box',
-    WebkitLineClamp: 4, // ✅ Show max 4 lines
+    WebkitLineClamp: 4, //  Show max 4 lines
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -291,4 +260,4 @@ const styles: { [key: string]: React.CSSProperties } = {
   }
 };
 
-export { DataCard, ItemCards };
+export { DataCard};

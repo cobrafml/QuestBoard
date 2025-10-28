@@ -8,6 +8,7 @@ const [message, setMessage] = useState("");
 const [updating, setUpdating] = useState(false);
 
 useEffect(() => {
+    //Fetch account info
     const fetchAccount = async () => {
     const loggedInUser = JSON.parse(sessionStorage.getItem("loggedInUser") || "null");
 
@@ -128,72 +129,72 @@ return (
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}
     {account.tenQuest ? (
             <img
-                src={account.tenQuest} //  Show badge image if owned
+                src={account.tenQuest}
                 alt="Tens quests"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}{account.twentyQuest ? (
             <img
-                src={account.twentyQuest} //  Show badge image if owned
+                src={account.twentyQuest} 
                 alt="twentyQuest"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}{account.fiveWeek ? (
             <img
-                src={account.fiveWeek} //  Show badge image if owned
+                src={account.fiveWeek} 
                 alt="Five Weeks"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}{account.tenWeek ? (
             <img
-                src={account.tenWeek} //  Show badge image if owned
+                src={account.tenWeek} 
                 alt="Ten Week"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}{account.treeMonth ? (
             <img
-                src={account.treeMonth} //  Show badge image if owned
+                src={account.treeMonth} 
                 alt="treeMonth"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}{account.sixMonth ? (
             <img
-                src={account.sixMonth} //  Show badge image if owned
+                src={account.sixMonth} 
                 alt="six Month"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}
     {account.twelvMonth ? (
             <img
-                src={account.twelvMonth} //  Show badge image if owned
+                src={account.twelvMonth} 
                 alt="twelvMonth"
                 width="200"
                 style={styles.image}
             />
     ) : (
-      <span style={styles.notOwned}>Badge not owned</span> //  Show text if empty
+    <span style={styles.notOwned}>Badge not owned</span> 
     )}
         </div>
     </div>
